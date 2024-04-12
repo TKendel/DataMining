@@ -126,8 +126,97 @@ efs_2 <- ExhaustiveSearch(model2, data = data2_reduced, family=NULL)
   # Top features: circumplex.arousal + circumplex.valence
 
 
+## LASSO feature selection 
 
-## Interaction between variables - data2
+library(glmnet)
+
+
+x <- as.matrix(subset(data1, select = -c(mood, time, hour, id, date)))
+Y=data1[, 'mood']
+
+X <- scale(x) #normalization of predictor
+
+set.seed(222)
+
+train=sample(1:nrow(X),0.67*nrow(X)) # train by using 2/3 of the x rows 
+X.train=X[train,]; Y.train=Y[train]  # data to train
+X.test=X[-train,]; Y.test = Y[-train]
+
+
+## LASSO
+lasso.model=glmnet(X.train,Y.train,alpha=1) 
+lasso.cv=cv.glmnet(X.train,Y.train,alpha=1,type.measure="mse")
+
+plot(lasso.model,label=T,xvar="lambda") 
+plot(lasso.cv) 
+
+lambda.min=lasso.cv$lambda.min; lambda.1se=lasso.cv$lambda.1se; 
+lambda.min; lambda.1se # best lambda by cross validation
+coef(lasso.model,s=lasso.cv$lambda.min) # Activity, circumplex.arousal and circumplex.valence are relevant
+coef(lasso.model,s=lasso.cv$lambda.1se) 
+
+
+
+
+# RIDGE REGRESSION
+
+X_drop <- as.matrix(subset(data1, select = -c(mood, time, hour, id, date, sms, call)))
+
+set.seed(222)
+
+train_drop=sample(1:nrow(X_drop),0.67*nrow(X_drop)) # train by using 2/3 of the x rows 
+X_drop.train=X_drop[train_drop,]; Y.train=Y[train_drop]  # data to train
+X_drop.test=X_drop[-train_drop,]; Y.test = Y[-train_drop]
+
+
+ridge.model=glmnet(X_drop.train,Y.train,alpha=0) 
+ridge.cv =cv.glmnet(X_drop.train,Y.train,alpha=0,type.measure="mse")
+
+plot(ridge.model,label=T,xvar="lambda") 
+plot(ridge.cv) 
+
+lambda.min=ridge.cv$lambda.min; lambda.1se=ridge.cv$lambda.1se; 
+lambda.min; lambda.1se # best lambda by cross validation
+coef(ridge.model,s=ridge.cv$lambda.min) # All are relevant
+coef(ridge.model,s=ridge.cv$lambda.1se) 
+
+
+# ELASTIC NET
+
+
+
+
+
+
+
+# ORDINAL LOGISTIC REGRESSION (RESPONSE VARIABLE IS ABOUT LEVEL OF MOOD)
+# (proportional odds logistic regression)
+
+install.packages("packagename")
+
+new_data1_predictors <- (subset(data1, select = -c(mood, time, hour, id, date)))
+
+new_data1_predictors_scaled <- scale(new_data1_predictors)
+d <- new_data1_predictors_scaled
+
+y_factor <- as.factor(data1$mood)
+model3 <- polr(y_factor ~ activity + appCat.builtin + appCat.communication + appCat.entertainment + 
+                 appCat.finance + appCat.game + appCat.office + appCat.other + appCat.social + 
+                 appCat.travel + appCat.unknown + appCat.utilities + appCat.weather + circumplex.arousal +
+                 circumplex.valence + screen, data = d, Hess=TRUE)
+
+
+
+## store table
+summary_table <- coef(summary(model3))
+
+## calculate and store p values (Obtain the significance of coefficients)
+pval <- pnorm(abs(summary_table[, "t value"]), lower.tail = FALSE) * 2
+
+## combined table
+summary_table <- cbind(summary_table, "p value" = round(pval,3))
+
+#signifcant variables: activity, utilities, weather, arousal, valence.
 
 
 
@@ -141,7 +230,11 @@ efs_2 <- ExhaustiveSearch(model2, data = data2_reduced, family=NULL)
 # --> shapiro.test(data2_reduced$activity). ERROR: sample size must be between 3 and 5000
 #shapiro.test(data2_reduced$activity[0:5000]) # Activity data is not normal
 
+## MIXED MODELS --> an individual has many observation. We have "longitudinal studies"
 
+# see EDDA code page 311/361
+
+## Interaction between variables - data2
 
 
 
