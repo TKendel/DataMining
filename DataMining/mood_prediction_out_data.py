@@ -27,6 +27,11 @@ pivot_df["time"] = pd.to_datetime(df["time"])
 pivot_df["hour"] = pivot_df["time"].dt.strftime('%H:00')
 pivot_df["hour"] = pd.Categorical(pivot_df["hour"], categories=sorted(pivot_df["hour"].unique()))
 
+variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
+time_variable_list = ["screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
+
+
+
 # # # Data summary ##
 # # Dataframe dimension
 # print(pivot_df.shape[0])
@@ -38,7 +43,7 @@ pivot_df["hour"] = pd.Categorical(pivot_df["hour"], categories=sorted(pivot_df["
 #     print(f"Number of null values in '{column}' are: {pivot_df[column].isna().sum(axis = 0)}")
 #     print("Counted items per column")
 #     print(pivot_df[column].value_counts())
-#     print(pivot_df.describe())
+# print(pivot_df.describe())
 
 
 # ### MOOD VARIABLE
@@ -86,7 +91,6 @@ pivot_df["hour"] = pd.Categorical(pivot_df["hour"], categories=sorted(pivot_df["
 # plt.show()
 
 # ## PROBABILITY DISTRIBUTION
-# variable_list = ["screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
 # for variable in variable_list:
 #     plt.hist(np.log(pivot_df[variable]), bins=30)
 
@@ -98,57 +102,59 @@ pivot_df["hour"] = pd.Categorical(pivot_df["hour"], categories=sorted(pivot_df["
 #     plt.clf()
 
 # ## BOX PLOTS
-# variable_list = ["screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
 # for variable in variable_list:
 #     sns.boxplot(np.log(pivot_df[variable]))
 
 #     file_name = f"graphs/boxPlotsLog/{variable}.png"
 #     plt.savefig(file_name)
 #     plt.clf()
-
-
-
-def drop_outliers(df, column_name, lower, upper):        
-    df = df.loc[(df[column_name] < upper) & (df[column_name] > lower)]
-    return df
      
-## LOWER AND UPPER BOUND
-variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
-for variable in variable_list:
-    print(30 * "*" + variable + 30 * "*")
-    upper_limit = pivot_df[variable].mean() + 3* pivot_df[variable].std() # Right from the mean
-    lower_limit = pivot_df[variable].mean() - 3* pivot_df[variable].std() # Left from the mean
-    print(upper_limit)
-    print(lower_limit)
-    q1 = pivot_df[variable].quantile(0.05)
-    q3 = pivot_df[variable].quantile(0.95)
-    IQR = q3 - q1
+# ## LOWER AND UPPER BOUND
+# for variable in variable_list:
+#     print(30 * "*" + variable + 30 * "*")
+#     upper_limit = pivot_df[variable].mean() + 3* pivot_df[variable].std() # Right from the mean
+#     lower_limit = pivot_df[variable].mean() - 3* pivot_df[variable].std() # Left from the mean
+#     print(upper_limit)
+#     print(lower_limit)
 
-    cut_off = IQR * 1.5
-    lower, upper = q3 - cut_off, q1 + cut_off
-    
-    outliers = [x for x in pivot_df[variable] if x < lower or x > upper]
-    print('Identified outliers: %d' % len(outliers))
+# # ## REMOVING OULTIERS USING QUANTILES
+# Q1 = pivot_df[variable_list].quantile(0.25)
+# Q3 = pivot_df[variable_list].quantile(0.75)
+# IQR = Q3 - Q1
 
-    outliers_removed = [x for x in pivot_df[variable] if x > lower and x < upper]
-    print('Non-outlier observations: %d' % len(outliers_removed))
-
-    # pivot_df = drop_outliers(pivot_df, variable, q3, q1)
+# df = pivot_df[~((pivot_df[variable_list] < (Q1 - 1.5 * IQR)) | (pivot_df[variable_list] > (Q3 + 1.5 * IQR))).any(axis=1)]
 
 
+## REMOVING OUTLIERS 
+df = pivot_df[~(pivot_df['appCat.builtin'] < 0)]
 
-# pivot_df['appCat.communication'] = np.log(pivot_df['appCat.communication'])
-# plt.hist(pivot_df['appCat.communication'])
-# plt.show()
+## LOG times
+for variable in time_variable_list:
+    df[f"{variable}log"] = np.log(df[variable])
+
+pd.plotting.scatter_matrix(df[["mood", "activity", "screenlog", "appCat.builtinlog", "appCat.communicationlog"]])
+plt.show()
 
 
-# ## REMOVAL
-# df = pivot_df[pivot_df['appCat.communication'] < 2000]  
-# df = df[df['appCat.builtin']  > 0 ]  
-print(pivot_df.shape[0])
-print(pivot_df.shape[1])
-print(pivot_df.head())
+# plt.hist(df['appCat.builtin'], bins=30)
 
-# Groupping after outliers
-# df = df.groupby([df["time"].dt.days, "id"])["value"].mean()
-# print(pd.head(df))
+# plt.xlabel('Data Values')
+# plt.ylabel('Frequency')
+
+# file_name = f"\{'appCat.builtin'}.png"
+# plt.savefig(file_name)
+# plt.clf()
+
+
+# ## BOX PLOTS
+# for variable in variable_list:
+#     sns.boxplot(np.log(df[variable]))
+
+#     file_name = f"graphs/boxPlotsNoOutliers/{variable}.png"
+#     plt.savefig(file_name)
+#     plt.clf()
+
+
+# ## GROUPING
+# g = df.groupby(pd.Grouper(key='time', freq='D')).mean()
+# print(g.first())
