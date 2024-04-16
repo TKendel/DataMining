@@ -152,3 +152,13 @@ print(pivot_df.head())
 # Groupping after outliers
 # df = df.groupby([df["time"].dt.days, "id"])["value"].mean()
 # print(pd.head(df))
+
+
+
+
+
+
+
+
+
+##pivot_df.to_csv("out_data.csv", sep=',', index=False, encoding='utf-8')
