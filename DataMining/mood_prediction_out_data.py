@@ -148,7 +148,7 @@ df = df[["time", "circumplex.arousal", "circumplex.valence", "activity", "mood"]
 # ## GROUPING
 ##TODO Group values based on ID before using the dataframe in predictions
 df = df.groupby(pd.Grouper(key='time', axis=0,  
-                      freq='1d', sort=True)).mean()
+                      freq='1h', sort=True)).mean()
 
 # Drop all rows that are completly empty
 df = df.dropna( axis=0, how="all")
@@ -159,7 +159,7 @@ df = df.interpolate(method="time")
 df.mood = df.mood.round()
 df['circumplex.valence'] = df['circumplex.valence'].round()
 df['circumplex.arousal'] = df['circumplex.arousal'].round()
-# df.to_excel("outputAll.xlsx")
+df.to_excel("outputAll.xlsx")
 
 
 
@@ -196,14 +196,20 @@ values = values.astype('float32')
 # normalize features
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled = scaler.fit_transform(values)
+print(values)
+print(scaled)
 # frame as supervised learning
-reframed = series_to_supervised(scaled, 1, 1)
+reframed = series_to_supervised(scaled, 1, 2)
+reframed.drop(reframed.columns[[4, 5, 6, 7, 8, 9, 10]], axis=1, inplace=True)
 print(reframed.head())
 
 ...
 # split into train and test sets
 values = reframed.values
-n_train_hours = 100
+train_size = int(len(df) * 0.67)
+# test_size = len(df) - train_size
+# train_dataset, test_dataset = df[0: train_size, : ], df[train_size]
+n_train_hours = train_size
 train = values[:n_train_hours, :]
 test = values[n_train_hours:, :]
 # split into input and outputs
