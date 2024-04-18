@@ -31,6 +31,47 @@ print(pivot_df.head() )
 #save pivot_df in a csv file
 pivot_df.to_csv('pivot_df.csv', index=False)
 
+
+##  Plot in report
+
+plt.hist([pivot_df['circumplex.arousal'], pivot_df['circumplex.valence']], label=['Arousal', 'Valence'], color=['b', 'c'])
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.title('Arousal and Valence score distribution')
+plt.legend(loc='upper left')
+plt.grid(False)
+plt.show()
+
+
+
+#plot aoursal and valence score by HOUR 
+plt.figure(figsize=(10, 6))
+hourly_mean_arousal = pivot_df.groupby("HOUR")["circumplex.arousal"].mean()
+hourly_mean_arousal.plot(marker='o', color='b', linestyle='-')
+
+hourly_mean_valence = pivot_df.groupby("HOUR")["circumplex.valence"].mean()
+hourly_mean_valence.plot(marker='o', color='c', linestyle='-')
+
+plt.title('Mean Valence and Aoursal Score by Hour')
+plt.xlabel('Hour of the Day')
+plt.ylabel('Mean Score')
+plt.legend(['Arousal', 'Valence'])
+plt.xticks(range(len(hourly_mean_valence.index)), hourly_mean_valence.index, rotation=45)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+### Plots for the variables
+
 # ### MOOD VARIABLE
 # #plotting mood variable
 
@@ -78,4 +119,7 @@ pivot_df.to_csv('pivot_df.csv', index=False)
 # plt.grid(True)
 # plt.tight_layout()
 # plt.show()
+
+
+
 
