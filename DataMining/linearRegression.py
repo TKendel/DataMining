@@ -1,77 +1,63 @@
 import numpy as np
 import pandas as pd
-import seaborn as sns
+import matplotlib.pyplot as plt
 
-from sklearn import preprocessing
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression
-from sklearn import metrics
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
+
 
 #open the out excel file
-data = pd.read_csv('DataMining\dataset_mood_smartphone.csv')
+data = pd.read_csv('dataset_no_NA_inter_fill.csv')
 df = pd.DataFrame(data)
 
-df["time"] = pd.to_datetime(df["time"])
-
-df['intID'] = df.id.astype('category').cat.codes
-
-pivot_df = df.reset_index().pivot_table(values="value", index=["intID", "time"], columns="variable", aggfunc='mean')
-
-# Split the "time" column into "date" and "time" columns
-pivot_df.reset_index(inplace=True)
-
-variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
-time_variable_list = ["screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
-
- ## LOG times
-for variable in time_variable_list:
-   pivot_df[f"{variable}log"] = np.log(pivot_df[variable])
-
-# ## REMOVING OULTIERS USING QUANTILES
-Q1 = pivot_df[variable_list].quantile(0.01)
-Q3 = pivot_df[variable_list].quantile(0.99)
-IQR = Q3 - Q1
-
-df = pivot_df[~((pivot_df[variable_list] < (Q1 - 1.5 * IQR)) | (pivot_df[variable_list] > (Q3 + 1.5 * IQR))).any(axis=1)]
+df = df.drop(['id', 'time', 'sms', 'call', 'DATE', 'TIME', 'HOUR'], axis=1)
 
 
-# ## GROUPING
-df = (df.groupby(['intID', pd.Grouper(freq='D', key='time')]).mean().reset_index())
 
+df['Lag_1'] = df['activity'].shift(1)
 
-df = df.drop(['intID', 'time', 'sms', 'call'], axis=1)
+df = df[['activity', 'Lag_1']]
 
-# Drop all rows that are completly empty
-df = df.dropna( axis=0, how="all")
-# Fill out nas using interpolation
+# X = df.loc[:,:]
+# X = df.drop(X.activity, axis=1)
+# y = df.loc[:, 'activity']  # create the target
+# y, X = y.align(X, join='inner')
+
 df = df.fillna(df.mean())
 
-y = df['appCat.weather']
-X = df.drop(['appCat.weather'], axis=1)
+# Split the data into features (X) and target (y)
+X = df.drop('activity', axis=1)
+y = df['activity']
 
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X,y, train_size=0.7, shuffle=True)
+X, X_test, y, y_test = train_test_split(X,y, train_size=0.7, shuffle=True)
 
-
-
-# X = df.loc[:, ['Lag_1']]
-# X.dropna(inplace=True)  # drop missing values in the feature set
-# y = df.loc[:, 'appCat.social']  # create the target
-# y, X = y.align(X, join='inner')  # drop corresponding values in target
+y_pred_baseline = [y.mean()] * len(y)
+mae_baseline = mean_absolute_error(y, y_pred_baseline)
+print("Mean Close Prices:", round(y.mean(), 2))
+print("Baseline MAE:", round(mae_baseline, 2), "\n")
 
 model = LinearRegression()
-model.fit(X_train, y_train)
+model.fit(X, y)
 
-print(model.intercept_)
-print(model.coef_)
-
-y_pred = np.round(model.predict(X_test))
-y_test = np.round(y_test)
+y_pred = pd.Series(model.predict(X), index=X.index)
 
 
-from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
-print(mean_absolute_error(y_test,y_pred))
-print(mean_absolute_percentage_error(y_test,y_pred))
-print(mean_squared_error(y_test,y_pred))
+fig, ax = plt.subplots()
+ax.plot(X['Lag_1'], y, '.', color='0.25')
+ax.plot(X['Lag_1'], y_pred)
+ax.set_aspect('equal')
+ax.set_ylabel('Activity')
+ax.set_xlabel('Lag_1')
+ax.set_title('Lag Plot of Activity ')
+plt.show()
+
+training_mae = mean_absolute_error(y, model.predict(X))
+test_mae = mean_absolute_error(y_test, model.predict(X_test))
+print("Training MAE:", round(training_mae, 2))
+print("Test MAE:", round(test_mae, 2), '\n')
+
+print(mean_absolute_error(y, y_pred))
+print(mean_absolute_percentage_error(y, y_pred))
+print(mean_squared_error(y, y_pred))
+
