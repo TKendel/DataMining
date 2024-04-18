@@ -9,7 +9,6 @@ from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, ConfusionMatrixDisplay
 
 
-
 #open the out excel file
 data = pd.read_csv('DataMining\dataset_mood_smartphone.csv')
 df = pd.DataFrame(data)
@@ -26,9 +25,9 @@ pivot_df.reset_index(inplace=True)
 variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
 time_variable_list = ["screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
 
- ## LOG times
-for variable in time_variable_list:
-   pivot_df[f"{variable}log"] = np.log(pivot_df[variable])
+#  ## LOG times
+# for variable in time_variable_list:
+#    pivot_df[f"{variable}log"] = np.log(pivot_df[variable])
 
 # ## REMOVING OULTIERS USING QUANTILES
 Q1 = pivot_df[variable_list].quantile(0.01)
@@ -46,6 +45,8 @@ df = (df.groupby(['intID', pd.Grouper(freq='D', key='time')]).mean().reset_index
 df = df.dropna( axis=0, how="all")
 # Fill out nas using interpolation
 df = df.set_index('time')
+
+'''TODO: FIND A BETTER NAN FILLER '''
 df = df.interpolate(method="time")
 
 df = df.drop(df.index[:27])
@@ -77,7 +78,7 @@ rf = RandomForestClassifier()
 rand_search = RandomizedSearchCV(rf, 
                                  param_distributions = param_dist, 
                                  n_iter=5, 
-                                 cv=5)
+                                 cv=5, )
 
 # Fit the random search object to the data
 rand_search.fit(X_train, y_train)
@@ -87,6 +88,7 @@ rf.fit(X_train, y_train)
 y_pred = rf.predict(X_test)
 
 accuracy = accuracy_score(y_test, y_pred)
+
 print("Accuracy:", accuracy)
 
 
