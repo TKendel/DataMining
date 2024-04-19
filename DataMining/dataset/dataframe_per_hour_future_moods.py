@@ -66,7 +66,7 @@ next_mood["time"] = next_mood["time"] + pd.Timedelta('-1 day')
 
 
 
-dataframe['next_mood'] = ""
+dataframe['next_mood'] = np.nan
 print("iterating for matches in date and id to add next_mood" )
 for  index, row in dataframe.iterrows():
     #print(row['time'].date() )
