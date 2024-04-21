@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import mean_absolute_error
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
@@ -42,7 +41,7 @@ def walk_forward_validation(data, percentage=0.2):
         yhat = random_forest_forecast(history, test_X)
         predictions.append(yhat)
         history.append(test[i])
-    
+
     Y_test = target_scaler.inverse_transform(test[:, -1:].reshape(1, -1))
     Y_pred = target_scaler.inverse_transform(np.array(predictions).reshape(1, -1))
     # estimate prediction error
@@ -60,7 +59,7 @@ df = df.drop(['id', 'sms', 'call', 'DATE', 'TIME', 'HOUR'], axis=1)
 df = df.groupby(pd.Grouper(key='time', axis=0,  
                       freq='D', sort=True)).mean()
 
-df = df.fillna(df.mean())
+df = df.interpolate(method="time")
 
 df['Lag_1'] = df['activity'].shift(1)
 df = df.dropna()
@@ -77,11 +76,16 @@ df['circumplex.arousal'] = np.round(df['circumplex.arousal'])
 feature_scaler = MinMaxScaler()
 target_scaler = MinMaxScaler()
 
+# Prediction
 mae, y, yhat = walk_forward_validation(df, 0.2)
 print('MAE: %.3f' % mae)
+
+f = open("modelStatOutput/RFR.txt", "w")
+f.write('MAE: %.3f' % mae)
 
 # plot expected vs predicted
 plt.plot(y[0], label='Expected')
 plt.plot(yhat[0], label='Predicted')
 plt.legend()
+plt.savefig('DataMining/modelGraphOutput/RandomForestRegressor.png')
 plt.show()
