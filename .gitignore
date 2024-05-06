@@ -1,0 +1,5 @@
+DataMining/output/*
+
+DataMining2/test_set_VU_DM.csv
+DataMining2/training_set_VU_DM.csv
+DataMining2/output/out.csv
