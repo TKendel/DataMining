@@ -1,0 +1,744 @@
+4958347 
+53 
+
+Data type of date_time is: object 
+Number of null values in date_time are: 0 
+items per columndate_time
+2012-11-02 14:04:51    95
+2012-12-26 10:59:30    87
+2013-05-15 18:39:51    70
+2012-11-23 07:28:55    69
+2013-04-01 11:14:25    68
+                       ..
+2013-04-01 18:08:41     5
+2013-04-13 06:42:11     5
+2013-06-24 10:36:15     5
+2013-01-14 04:20:54     5
+2012-11-11 11:05:44     5
+Name: count, Length: 198615, dtype: int64 
+
+Data type of site_id is: int64 
+Number of null values in site_id are: 0 
+items per columnsite_id
+5     3086006
+14     481664
+15     310788
+24     237838
+32     177330
+18     127397
+16      90032
+12      73891
+19      42758
+9       42171
+22      40262
+11      34656
+7       32067
+29      29475
+31      24420
+26      16182
+4       13499
+25      12304
+23      11620
+1       10943
+34       9944
+10       9360
+13       8205
+17       6182
+2        5540
+27       5086
+28       4318
+30       3895
+21       3654
+3        3487
+6        2522
+33        663
+20        157
+8          31
+Name: count, dtype: int64 
+
+Data type of visitor_location_country_id is: int64 
+Number of null values in visitor_location_country_id are: 0 
+items per columnvisitor_location_country_id
+219    2892489
+100     495476
+55      290461
+216     217385
+220     174296
+        ...   
+226         25
+190         24
+146         15
+83          13
+150          8
+Name: count, Length: 210, dtype: int64 
+
+Data type of visitor_hist_starrating is: float64 
+Number of null values in visitor_hist_starrating are: 4706481 
+items per columnvisitor_hist_starrating
+4.00    23416
+3.00    20879
+3.50    17088
+2.50    10534
+2.00     9157
+        ...  
+2.01       16
+1.96       11
+1.92        7
+4.65        6
+4.96        6
+Name: count, Length: 312, dtype: int64 
+
+Data type of visitor_hist_adr_usd is: float64 
+Number of null values in visitor_hist_adr_usd are: 4705359 
+items per columnvisitor_hist_adr_usd
+128.34    609
+117.68    579
+270.36    514
+65.00     275
+117.86    250
+         ... 
+53.08       5
+182.56      5
+234.77      5
+153.44      5
+99.39       5
+Name: count, Length: 7799, dtype: int64 
+
+Data type of prop_country_id is: int64 
+Number of null values in prop_country_id are: 0 
+items per columnprop_country_id
+219    3030125
+100     311283
+55      186465
+31      154287
+99      135388
+        ...   
+180         12
+7           10
+126          7
+204          5
+165          2
+Name: count, Length: 172, dtype: int64 
+
+Data type of prop_id is: int64 
+Number of null values in prop_id are: 0 
+items per columnprop_id
+104517    2357
+124342    2355
+68420     2285
+40279     2275
+134154    2257
+          ... 
+115439       1
+134795       1
+57042        1
+66680        1
+87173        1
+Name: count, Length: 129113, dtype: int64 
+
+Data type of prop_starrating is: int64 
+Number of null values in prop_starrating are: 0 
+items per columnprop_starrating
+3    1947598
+4    1521448
+2     895894
+5     406485
+0     169572
+1      17350
+Name: count, dtype: int64 
+
+Data type of prop_review_score is: float64 
+Number of null values in prop_review_score are: 7364 
+items per columnprop_review_score
+4.0    1556948
+4.5    1546880
+3.5     768054
+3.0     375905
+5.0     235947
+0.0     233294
+2.5     143886
+2.0      62301
+1.5      14465
+1.0      13303
+Name: count, dtype: int64 
+
+Data type of prop_brand_bool is: int64 
+Number of null values in prop_brand_bool are: 0 
+items per columnprop_brand_bool
+1    3147060
+0    1811287
+Name: count, dtype: int64 
+
+Data type of prop_location_score1 is: float64 
+Number of null values in prop_location_score1 are: 0 
+items per columnprop_location_score1
+0.00    273229
+0.69    251968
+1.10    227912
+1.39    216682
+1.61    207619
+         ...  
+6.66        48
+6.62        39
+6.63        38
+6.57        27
+6.96        15
+Name: count, Length: 337, dtype: int64 
+
+Data type of prop_location_score2 is: float64 
+Number of null values in prop_location_score2 are: 1090348 
+items per columnprop_location_score2
+0.0002    13100
+0.0004    12600
+0.0001    12152
+0.0003    12063
+0.0008    11693
+          ...  
+0.8876        1
+0.8831        1
+0.8543        1
+0.9272        1
+0.8995        1
+Name: count, Length: 9342, dtype: int64 
+
+Data type of prop_log_historical_price is: float64 
+Number of null values in prop_log_historical_price are: 0 
+items per columnprop_log_historical_price
+0.00    713899
+6.21     88837
+5.02     36267
+5.07     35177
+4.98     35118
+         ...  
+2.55         1
+2.26         1
+1.67         1
+2.49         1
+2.34         1
+Name: count, Length: 392, dtype: int64 
+
+Data type of position is: int64 
+Number of null values in position are: 0 
+items per columnposition
+1     199415
+3     199355
+2     199350
+6     199172
+7     194769
+4     193406
+8     190375
+9     186236
+12    178279
+13    174815
+10    173451
+14    171160
+15    167552
+18    160544
+19    157174
+16    154699
+20    153861
+21    150530
+24    143693
+25    140267
+22    138058
+26    136850
+27    133549
+28    130260
+29    126879
+30    123017
+31    118672
+32    111617
+33    105601
+34     99121
+35     87619
+36     67011
+37     36866
+17     11353
+11     11277
+23     10835
+38     10704
+5       9312
+39      1577
+40        66
+Name: count, dtype: int64 
+
+Data type of price_usd is: float64 
+Number of null values in price_usd are: 0 
+items per columnprice_usd
+99.00     76129
+119.00    65077
+109.00    64317
+89.00     62561
+129.00    56130
+          ...  
+566.55        1
+756.07        1
+745.18        1
+672.06        1
+818.18        1
+Name: count, Length: 76465, dtype: int64 
+
+Data type of promotion_flag is: int64 
+Number of null values in promotion_flag are: 0 
+items per columnpromotion_flag
+0    3889229
+1    1069118
+Name: count, dtype: int64 
+
+Data type of srch_destination_id is: int64 
+Number of null values in srch_destination_id are: 0 
+items per columnsrch_destination_id
+8192     69832
+4562     57090
+9402     40629
+8347     33274
+10979    33264
+         ...  
+2405         5
+21979        5
+16506        5
+4036         5
+22915        5
+Name: count, Length: 18127, dtype: int64 
+
+Data type of srch_length_of_stay is: int64 
+Number of null values in srch_length_of_stay are: 0 
+items per columnsrch_length_of_stay
+1     2143980
+2     1203153
+3      717298
+4      373594
+5      185744
+7      117171
+6      102671
+8       33584
+9       19224
+10      16769
+14      13282
+11       8593
+12       5992
+13       4797
+15       2961
+16       1540
+21       1513
+17       1165
+18        863
+19        784
+28        778
+20        754
+25        401
+24        363
+22        362
+27        309
+26        289
+23        239
+34         65
+33         32
+30         27
+44         22
+41         10
+57          7
+29          6
+31          5
+Name: count, dtype: int64 
+
+Data type of srch_booking_window is: int64 
+Number of null values in srch_booking_window are: 0 
+items per columnsrch_booking_window
+1      374949
+0      276815
+2      244186
+3      206126
+4      183088
+        ...  
+421         5
+433         5
+419         5
+478         5
+403         5
+Name: count, Length: 429, dtype: int64 
+
+Data type of srch_adults_count is: int64 
+Number of null values in srch_adults_count are: 0 
+items per columnsrch_adults_count
+2    3246234
+1    1156861
+4     242176
+3     239029
+6      31043
+5      27056
+8      10300
+7       4435
+9       1213
+Name: count, dtype: int64 
+
+Data type of srch_children_count is: int64 
+Number of null values in srch_children_count are: 0 
+items per columnsrch_children_count
+0    3811774
+1     675701
+2     386976
+3      58080
+4      19829
+5       2949
+6       2066
+8        574
+7        332
+9         66
+Name: count, dtype: int64 
+
+Data type of srch_room_count is: int64 
+Number of null values in srch_room_count are: 0 
+items per columnsrch_room_count
+1    4520212
+2     369152
+3      47656
+4      12175
+5       3829
+6       2181
+8       1959
+7       1183
+Name: count, dtype: int64 
+
+Data type of srch_saturday_night_bool is: int64 
+Number of null values in srch_saturday_night_bool are: 0 
+items per columnsrch_saturday_night_bool
+1    2490145
+0    2468202
+Name: count, dtype: int64 
+
+Data type of srch_query_affinity_score is: float64 
+Number of null values in srch_query_affinity_score are: 4640941 
+items per columnsrch_query_affinity_score
+-6.1394     198
+-6.2064     183
+-6.6835     176
+-6.2856     171
+-6.9845     165
+           ... 
+-33.4150      1
+-32.9408      1
+-23.3269      1
+-18.3888      1
+-33.4051      1
+Name: count, Length: 199387, dtype: int64 
+
+Data type of orig_destination_distance is: float64 
+Number of null values in orig_destination_distance are: 1607782 
+items per columnorig_destination_distance
+0.38       663
+0.26       549
+0.39       549
+0.24       540
+0.25       524
+          ... 
+5475.61      1
+3618.50      1
+5469.85      1
+5474.14      1
+4937.44      1
+Name: count, Length: 530595, dtype: int64 
+
+Data type of random_bool is: int64 
+Number of null values in random_bool are: 0 
+items per columnrandom_bool
+0    3491170
+1    1467177
+Name: count, dtype: int64 
+
+Data type of comp1_rate is: float64 
+Number of null values in comp1_rate are: 4838417 
+items per columncomp1_rate
+ 1.0    67256
+ 0.0    42959
+-1.0     9715
+Name: count, dtype: int64 
+
+Data type of comp1_inv is: float64 
+Number of null values in comp1_inv are: 4828788 
+items per columncomp1_inv
+ 0.0    122599
+ 1.0      5492
+-1.0      1468
+Name: count, dtype: int64 
+
+Data type of comp1_rate_percent_diff is: float64 
+Number of null values in comp1_rate_percent_diff are: 4863908 
+items per columncomp1_rate_percent_diff
+9.0       11317
+6.0       11082
+7.0        9156
+10.0       8582
+15.0       8515
+          ...  
+5273.0        1
+6300.0        1
+4803.0        1
+2195.0        1
+2682.0        1
+Name: count, Length: 1830, dtype: int64 
+
+Data type of comp2_rate is: float64 
+Number of null values in comp2_rate are: 2933675 
+items per columncomp2_rate
+ 0.0    1613590
+ 1.0     250276
+-1.0     160806
+Name: count, dtype: int64 
+
+Data type of comp2_inv is: float64 
+Number of null values in comp2_inv are: 2828078 
+items per columncomp2_inv
+ 0.0    2010094
+ 1.0     101958
+-1.0      18217
+Name: count, dtype: int64 
+
+Data type of comp2_rate_percent_diff is: float64 
+Number of null values in comp2_rate_percent_diff are: 4402109 
+items per columncomp2_rate_percent_diff
+11.0      43133
+6.0       39004
+5.0       36780
+10.0      32392
+9.0       27414
+          ...  
+6751.0        1
+353.0         1
+384.0         1
+473.0         1
+382.0         1
+Name: count, Length: 596, dtype: int64 
+
+Data type of comp3_rate is: float64 
+Number of null values in comp3_rate are: 3424059 
+items per columncomp3_rate
+ 0.0    1212580
+ 1.0     174118
+-1.0     147590
+Name: count, dtype: int64 
+
+Data type of comp3_inv is: float64 
+Number of null values in comp3_inv are: 3307357 
+items per columncomp3_inv
+ 0.0    1501978
+ 1.0     122194
+-1.0      26818
+Name: count, dtype: int64 
+
+Data type of comp3_rate_percent_diff is: float64 
+Number of null values in comp3_rate_percent_diff are: 4485550 
+items per columncomp3_rate_percent_diff
+11.0        35645
+5.0         34625
+10.0        29332
+6.0         29205
+9.0         25372
+            ...  
+472.0           1
+194784.0        1
+93658.0         1
+888.0           1
+122452.0        1
+Name: count, Length: 534, dtype: int64 
+
+Data type of comp4_rate is: float64 
+Number of null values in comp4_rate are: 4650969 
+items per columncomp4_rate
+ 0.0    204349
+-1.0     54057
+ 1.0     48972
+Name: count, dtype: int64 
+
+Data type of comp4_inv is: float64 
+Number of null values in comp4_inv are: 4614684 
+items per columncomp4_inv
+ 0.0    301385
+ 1.0     37747
+-1.0      4531
+Name: count, dtype: int64 
+
+Data type of comp4_rate_percent_diff is: float64 
+Number of null values in comp4_rate_percent_diff are: 4827261 
+items per columncomp4_rate_percent_diff
+9.0       12964
+10.0       8222
+11.0       7373
+5.0        6889
+2.0        6437
+          ...  
+985.0         1
+1403.0        1
+856.0         1
+310.0         1
+205.0         1
+Name: count, Length: 482, dtype: int64 
+
+Data type of comp5_rate is: float64 
+Number of null values in comp5_rate are: 2735974 
+items per columncomp5_rate
+ 0.0    1616232
+ 1.0     328268
+-1.0     277873
+Name: count, dtype: int64 
+
+Data type of comp5_inv is: float64 
+Number of null values in comp5_inv are: 2598327 
+items per columncomp5_inv
+ 0.0    2184479
+ 1.0     148457
+-1.0      27084
+Name: count, dtype: int64 
+
+Data type of comp5_rate_percent_diff is: float64 
+Number of null values in comp5_rate_percent_diff are: 4117248 
+items per columncomp5_rate_percent_diff
+11.0        61704
+5.0         54074
+10.0        53214
+6.0         42836
+17.0        40224
+            ...  
+1255.0          1
+436.0           1
+469.0           1
+897.0           1
+205166.0        1
+Name: count, Length: 645, dtype: int64 
+
+Data type of comp6_rate is: float64 
+Number of null values in comp6_rate are: 4718190 
+items per columncomp6_rate
+ 0.0    160932
+ 1.0     55022
+-1.0     24203
+Name: count, dtype: int64 
+
+Data type of comp6_inv is: float64 
+Number of null values in comp6_inv are: 4697371 
+items per columncomp6_inv
+ 0.0    235563
+ 1.0     22618
+-1.0      2795
+Name: count, dtype: int64 
+
+Data type of comp6_rate_percent_diff is: float64 
+Number of null values in comp6_rate_percent_diff are: 4862173 
+items per columncomp6_rate_percent_diff
+11.0     9042
+5.0      8345
+2.0      5630
+10.0     5191
+17.0     4665
+         ... 
+860.0       1
+416.0       1
+315.0       1
+308.0       1
+707.0       1
+Name: count, Length: 380, dtype: int64 
+
+Data type of comp7_rate is: float64 
+Number of null values in comp7_rate are: 4642999 
+items per columncomp7_rate
+ 0.0    203203
+ 1.0     79088
+-1.0     33057
+Name: count, dtype: int64 
+
+Data type of comp7_inv is: float64 
+Number of null values in comp7_inv are: 4601925 
+items per columncomp7_inv
+ 0.0    318201
+ 1.0     33938
+-1.0      4283
+Name: count, dtype: int64 
+
+Data type of comp7_rate_percent_diff is: float64 
+Number of null values in comp7_rate_percent_diff are: 4819832 
+items per columncomp7_rate_percent_diff
+11.0      9811
+10.0      9215
+5.0       8836
+2.0       7152
+9.0       6497
+          ... 
+308.0        1
+191.0        1
+273.0        1
+318.0        1
+1183.0       1
+Name: count, Length: 585, dtype: int64 
+
+Data type of comp8_rate is: float64 
+Number of null values in comp8_rate are: 3041693 
+items per columncomp8_rate
+ 0.0    1487647
+-1.0     272865
+ 1.0     156142
+Name: count, dtype: int64 
+
+Data type of comp8_inv is: float64 
+Number of null values in comp8_inv are: 2970844 
+items per columncomp8_inv
+ 0.0    1905472
+ 1.0      50916
+-1.0      31115
+Name: count, dtype: int64 
+
+Data type of comp8_rate_percent_diff is: float64 
+Number of null values in comp8_rate_percent_diff are: 4343617 
+items per columncomp8_rate_percent_diff
+10.0      46467
+5.0       45989
+11.0      43895
+6.0       40797
+7.0       35120
+          ...  
+4845.0        1
+483.0         1
+524.0         1
+230.0         1
+346.0         1
+Name: count, Length: 491, dtype: int64 
+
+Data type of click_bool is: int64 
+Number of null values in click_bool are: 0 
+items per columnclick_bool
+0    4736468
+1     221879
+Name: count, dtype: int64 
+
+Data type of gross_bookings_usd is: float64 
+Number of null values in gross_bookings_usd are: 4819957 
+items per columngross_bookings_usd
+89.99      43
+112.03     42
+133.69     39
+113.66     37
+231.85     36
+           ..
+316.19      1
+34.23       1
+577.31      1
+1301.39     1
+1257.24     1
+Name: count, Length: 60687, dtype: int64 
+
+Data type of booking_bool is: int64 
+Number of null values in booking_bool are: 0 
+items per columnbooking_bool
+0    4819957
+1     138390
+Name: count, dtype: int64 
+            site_id  visitor_location_country_id  visitor_hist_starrating  visitor_hist_adr_usd  prop_country_id  ...     comp8_inv  comp8_rate_percent_diff    click_bool  gross_bookings_usd  booking_bool
+count  4.958347e+06                 4.958347e+06            251866.000000         252988.000000     4.958347e+06  ...  1.987503e+06            614730.000000  4.958347e+06       138390.000000  4.958347e+06
+mean   9.953133e+00                 1.753405e+02                 3.374334            176.022659     1.739739e+02  ...  9.962752e-03                22.430384  4.474858e-02          386.283316  2.791051e-02
+std    7.646890e+00                 6.591625e+01                 0.692519            107.254493     6.834525e+01  ...  2.029142e-01               895.965854  2.067514e-01          821.190577  1.647165e-01
+min    1.000000e+00                 1.000000e+00                 1.410000              0.000000     1.000000e+00  ... -1.000000e+00                 2.000000  0.000000e+00            0.000000  0.000000e+00
+25%    5.000000e+00                 1.000000e+02                 2.920000            109.810000     1.000000e+02  ...  0.000000e+00                 7.000000  0.000000e+00          124.000000  0.000000e+00
+50%    5.000000e+00                 2.190000e+02                 3.450000            152.240000     2.190000e+02  ...  0.000000e+00                11.000000  0.000000e+00          218.400000  0.000000e+00
+75%    1.400000e+01                 2.190000e+02                 3.930000            213.490000     2.190000e+02  ...  0.000000e+00                17.000000  0.000000e+00          429.790000  0.000000e+00
+max    3.400000e+01                 2.310000e+02                 5.000000           1958.700000     2.300000e+02  ...  1.000000e+00            149400.000000  1.000000e+00       159292.380000  1.000000e+00
+
+[8 rows x 52 columns] 
