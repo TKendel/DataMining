@@ -21,7 +21,9 @@ from sklearn import metrics
 
 ## Load data into data frame ##
 data = pd.read_csv("DataMining2/training_set_VU_DM.csv", index_col=0)
+test_data = pd.read_csv("DataMining2/test_set_VU_DM.csv", index_col=0)
 df = pd.DataFrame(data)
+df_test = pd.DataFrame(test_data)
 
 # # # Data summary ##
 # # Dataframe dimension
@@ -44,6 +46,8 @@ print(df.groupby('visitor_location_country_id').size().nlargest(5))
 The data dfes dollars as the go to currency and a lot of the hotel searches
 are in one country, out of the total 4958347 rows, 58.33% is one country
 which is very likely the dfA :).
+Maybe just using that part of the dataset would be better since undersampling/oversampling
+for the rest migh prove time consuming.
 """
 
 # # Remove all columns that n nan values above a certain threshold
@@ -79,7 +83,7 @@ print(df.isnull().sum())
 # Remove null values
 df["prop_review_score"].fillna((df["prop_review_score"].mean()), inplace=True)
 df["prop_location_score2"].fillna((df["prop_location_score2"].mean()), inplace=True)
-df['orig_destination_distance'].fillna((df['orig_destination_distance'].median()), inplace=True)
+df['orig_destination_distance'].fillna((df['orig_destination_distance'].mean()), inplace=True)
 
 print(df.isnull().sum())
 
@@ -116,23 +120,22 @@ print(df.isnull().sum())
 #             yticklabels=corr.columns.values)
 # plt.savefig("DataMining2/graphs/correlationMatrixSpearman.png")
 
-# Clean up at asile 3
+# # Clean up at asile 3
 # Remove duplicate data
 df = df.drop_duplicates()
 # Remove completly empty rows and columns
 df = df.dropna(how='all', axis='columns')
 df = df.dropna(how='all', axis='rows')
 
-# Save to CSV
-# df.to_csv('DataMining2/output/out.csv', index=False)
-
-# correlation = df.corr()
+# correlation = df.corr(method = 'spearman')
 # plt.figure(figsize=(18, 18))
 # sns.heatmap(correlation, vmax=1, square=True,annot=True,cmap='viridis')
 # plt.title('Correlation between different fearures')
 # file_name = f"DataMining2/graphs/graphHotelSummary/correlation.png"
 # plt.savefig(file_name)
 
+
+# # Undersampling
 # Get all clicked on hotels
 click_indices = df[df.click_bool == 1].index
 # Randomize selection between them
@@ -141,27 +144,29 @@ random_indices = np.random.choice(click_indices, len(df.loc[df.click_bool == 1])
 click_sample = df.loc[random_indices]
 
 not_click = df[df.click_bool == 0].index
+# Get random rows with click_bool=0 and make a vector of size sum click_bool, or len(click_indices)
 random_indices = np.random.choice(not_click, sum(df['click_bool']), replace=False)
 not_click_sample = df.loc[random_indices]
 
 df_new = pd.concat([not_click_sample, click_sample], axis=0)
 
-print("Percentage of not click impressions: ", len(df_new[df_new.click_bool == 0])/len(df_new))
-print("Percentage of click impression: ", len(df_new[df_new.click_bool == 1])/len(df_new))
-print("Total number of records in resampled data: ", len(df_new))
+# The data is split now 50/50 between clicked and not clicked
+print("Number of rows", len(df_new))
+
+# Save to CSV
+df_new.to_csv('DataMining2/output/out2.csv', index=False)
 
 mms = MinMaxScaler()
 df_new[['price_usd','orig_destination_distance']] = mms.fit_transform(df_new[['price_usd','orig_destination_distance']])
 
-Y1 = df_new['click_bool']
-Y2 = df_new['booking_bool']
+Y = df_new['click_bool']
 df_new = df_new.drop(columns=['click_bool', 'booking_bool'], axis=1)
 X = df_new
 
 # Split the data into features (X) and target (y)
 # X = df.drop('click_bool', axis=1)
 # y = df['click_bool']
-X_train,X_test, y_train,y_test = train_test_split(X, Y1, test_size=0.3, random_state=1)
+X_train,X_test, y_train,y_test = train_test_split(X, Y, test_size=0.3, random_state=1)
 
 # # Featurer selection dfing ANOVA
 # fs = SelectKBest(score_func=f_classif, k=10)
@@ -192,6 +197,9 @@ X_train,X_test, y_train,y_test = train_test_split(X, Y1, test_size=0.3, random_s
 # print(df['click_bool'].value_counts())
 rf =RandomForestClassifier(n_estimators=51,min_samples_leaf=5,min_samples_split=3)
 
+
+# test_data_X = test_data.drop(columns=['click_bool'], axis=1)
+# test_data_y = test_data['click_bool']
 
 def print_evaluation_metrics(trained_model,trained_model_name,X_test,y_test):
     print('--------- Model : ', trained_model_name, ' ---------------\n')
