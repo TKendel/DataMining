@@ -14,8 +14,6 @@ df['time'] = pd.to_datetime(df.time)
 
 df = df.drop(['id', 'sms', 'call', 'DATE', 'TIME', 'HOUR'], axis=1)
 
-df['Lag_1'] = df['activity'].shift(1)
-
 ## GROUPING
 df = df.groupby(pd.Grouper(key='time', axis=0,  
                       freq='D', sort=True)).mean()
@@ -40,7 +38,7 @@ df.dropna(inplace=True)
 X = df.drop('Lag_1', axis=1)
 y = df['Lag_1']
 
-X, X_test, y, y_test = train_test_split(X, y, train_size=0.7, shuffle=True)
+X, X_test, y, y_test = train_test_split(X, y, train_size=0.7, shuffle=False)
 
 y_pred_baseline = [y.mean()] * len(y)
 mae_baseline = mean_absolute_error(y, y_pred_baseline)
@@ -55,7 +53,9 @@ y_pred = pd.Series(model.predict(X), index=X.index)
 
 plt.scatter(X['activity'], y,color='g')
 plt.plot(X['activity'], y_pred,color='k')
-
+plt.xlabel("Expected activity")
+plt.ylabel("Predicted activity")
+plt.savefig('DataMining/modelGraphOutput/LR.png')
 plt.show()
 
 # fig, ax = plt.subplots()
@@ -76,7 +76,11 @@ print(mean_absolute_error(y, y_pred))
 print(mean_absolute_percentage_error(y, y_pred))
 print(mean_squared_error(y, y_pred))
 
+
 f = open("modelStatOutput/LR.txt", "w")
+rmse = np.sqrt(mean_squared_error(y, y_pred))
 f.write( f'MAE: {mean_absolute_error(y,y_pred)}')
-f.write( f'MAPE: {mean_absolute_percentage_error(y,y_pred)}')
-f.write( f'MSE: {mean_squared_error(y,y_pred)}')
+f.write( f'\nRMSE: {rmse}\n')
+f.write( f'\nMSE: {mean_squared_error(y,y_pred)}')
+
+

@@ -30,11 +30,14 @@ df['circumplex.arousal'] = np.round(df['circumplex.arousal'])
 
 df = df.interpolate(method="time")
 
+variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "mood"]
+
+
 values = df.values
 print(df.head(40))
 # integer encode direction
 encoder = LabelEncoder()
-values[:,2] = encoder.fit_transform(values[:,2])
+values[:,3] = encoder.fit_transform(values[:,3])
 
 # ensure all data is float
 values = values.astype('float32')

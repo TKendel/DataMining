@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 
 from matplotlib import pyplot
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import LabelEncoder
+from sklearn import metrics
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.metrics import mean_squared_error
 from keras.models import Sequential
 from keras.layers import Dense
@@ -18,6 +18,15 @@ df = pd.DataFrame(data)
 df['time'] = pd.to_datetime(df.time)
 
 df = df.drop(['id', 'sms', 'call', 'DATE', 'TIME', 'HOUR'], axis=1)
+variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "mood"]
+
+# ## REMOVING OULTIERS USING QUANTILES
+Q1 = df[variable_list].quantile(0.01)
+Q3 = df[variable_list].quantile(0.99)
+IQR = Q3 - Q1
+
+df = df[~((df[variable_list] < (Q1 - 1.5 * IQR)) | (df[variable_list] > (Q3 + 1.5 * IQR))).any(axis=1)]
+
 
 ## GROUPING
 df = df.groupby(pd.Grouper(key='time', axis=0,  
@@ -30,14 +39,18 @@ df['circumplex.arousal'] = np.round(df['circumplex.arousal'])
 
 df = df.interpolate(method="time")
 
+df = df[["circumplex.arousal", "circumplex.valence", "activity", "mood"]].copy()
+
 values = df.values
-feature_values = df.drop('mood', axis = 1).values
-target_value = df['mood'].values
-data_scaled = np.concatenate((feature_values, target_value[:, None]), axis=1)
 # integer encode direction
+encoder = LabelEncoder()
+values[:, -1] = encoder.fit_transform(values[:, -1])
+
+# ensure all data is float
+values = values.astype('float32')
 # normalize features
 scaler = MinMaxScaler(feature_range=(0, 1))
-scaled = scaler.fit_transform(data_scaled) 
+scaled = scaler.fit_transform(values) 
 
 # frame as supervised learning
 reframed = series_to_supervised(scaled, 1, 1)
@@ -45,7 +58,9 @@ reframed = series_to_supervised(scaled, 1, 1)
 # This need to be changed depedning on the reframed params provided, and the len of columns
 # Typically we cut of everyhing apart from the for original collumn values denoted by -1, and the single target column denoted by var/+1/+2
 # depending on how far we are shifting i.e. looking into the future
-reframed.drop(reframed.iloc[:, 17:33], inplace=True, axis=1)
+reframed.drop(reframed.iloc[:, 5:8], inplace=True, axis=1)
+
+print(reframed)
 
 # split into train and test sets
 values = reframed.values
@@ -53,6 +68,7 @@ train_size = int(len(df) * 0.8)
 train = values[:train_size, :]
 test = values[train_size:, :]
 
+print(test)
 # split into input and outputs
 train_X, train_y = train[:, :-1], train[:, -1]
 test_X, test_y = test[:, :-1], test[:, -1]
@@ -69,11 +85,14 @@ model.add(Dense(1))
 model.compile(loss='mae', optimizer='adam')
 
 # fit network
-history = model.fit(train_X, train_y, epochs=50, batch_size=50, validation_data=(test_X, test_y), verbose=2, shuffle=False)
+history = model.fit(train_X, train_y, epochs=150, batch_size=79, validation_data=(test_X, test_y), verbose=2, shuffle=False)
 
 # plot history
 pyplot.plot(history.history['loss'], label='train')
 pyplot.plot(history.history['val_loss'], label='test')
+pyplot.xlabel("Number of epochs")
+pyplot.ylabel("Loss")
+pyplot.title("LSTM loss evaluation")
 pyplot.legend()
 pyplot.savefig('DataMining/modelGraphOutput/LSTM.png')
 pyplot.show()
@@ -83,7 +102,9 @@ yhat = model.predict(test_X)
 test_X = test_X.reshape((test_X.shape[0], test_X.shape[2]))
 
 # invert scaling for forecast
+
 inv_yhat = np.concatenate((yhat, test_X[:, 1:]), axis=1)
+print(inv_yhat)
 inv_yhat = scaler.inverse_transform(inv_yhat)
 inv_yhat = inv_yhat[:,0]
 

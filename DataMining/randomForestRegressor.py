@@ -17,6 +17,7 @@ def train_test_split(df, test_size=0.2):
     data_scaled = np.concatenate((scaled_data, scaled_target), axis=1)
 
     n = int(len(data_scaled) * (1 - test_size))
+    print(data_scaled[n:].shape[1])
     return data_scaled[:n], data_scaled[n:]
 
 def random_forest_forecast(train, value):
@@ -55,6 +56,24 @@ df['time'] = pd.to_datetime(df.time)
 
 df = df.drop(['id', 'sms', 'call', 'DATE', 'TIME', 'HOUR'], axis=1)
 
+variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
+
+# ## REMOVING OULTIERS USING QUANTILES
+Q1 = df[variable_list].quantile(0.01)
+Q3 = df[variable_list].quantile(0.99)
+IQR = Q3 - Q1
+
+df = df[~((df[variable_list] < (Q1 - 1.5 * IQR)) | (df[variable_list] > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "mood"]
+
+# ## REMOVING OULTIERS USING QUANTILES
+Q1 = df[variable_list].quantile(0.01)
+Q3 = df[variable_list].quantile(0.99)
+IQR = Q3 - Q1
+
+df = df[~((df[variable_list] < (Q1 - 1.5 * IQR)) | (df[variable_list] > (Q3 + 1.5 * IQR))).any(axis=1)]
+
 ## GROUPING
 df = df.groupby(pd.Grouper(key='time', axis=0,  
                       freq='D', sort=True)).mean()
@@ -80,12 +99,18 @@ target_scaler = MinMaxScaler()
 mae, y, yhat = walk_forward_validation(df, 0.2)
 print('MAE: %.3f' % mae)
 
+from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
 f = open("modelStatOutput/RFR.txt", "w")
-f.write('MAE: %.3f' % mae)
+f.write(f'MAE: {mean_absolute_error(y,yhat)}')
+f.write('\nRMSE: %.3f' %  np.sqrt(mean_squared_error(y, yhat)))
+f.write(f'\nMSE: {mean_squared_error(y,yhat)}')
 
 # plot expected vs predicted
 plt.plot(y[0], label='Expected')
 plt.plot(yhat[0], label='Predicted')
+plt.xlabel("Number of expected activities")
+plt.ylabel("Activity")
+plt.title("Predicted vs Expected")
 plt.legend()
 plt.savefig('DataMining/modelGraphOutput/RandomForestRegressor.png')
 plt.show()

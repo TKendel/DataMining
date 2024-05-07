@@ -23,7 +23,7 @@ def random_forest_forecast(train, value):
     train = np.array(train)
     X, Y = train[:, :-1], train[:, -1:]
     global model
-    model = RandomForestClassifier(n_estimators=1000)
+    model = RandomForestClassifier(n_estimators=500)
 
     model.fit(X, Y)
     val = np.array(value).reshape(1, -1)
@@ -57,11 +57,22 @@ df['time'] = pd.to_datetime(df.time)
 
 df = df.drop(['id', 'sms', 'call', 'DATE', 'TIME', 'HOUR'], axis=1)
 
+variable_list = ["circumplex.arousal", "circumplex.valence", "activity", "screen", "appCat.builtin", "appCat.communication", "appCat.entertainment", "appCat.finance", "appCat.game", "appCat.office", "appCat.other", "appCat.social", "appCat.travel", "appCat.unknown", "appCat.utilities", "appCat.weather"]
+
+# ## REMOVING OULTIERS USING QUANTILES
+Q1 = df[variable_list].quantile(0.01)
+Q3 = df[variable_list].quantile(0.99)
+IQR = Q3 - Q1
+
+df = df[~((df[variable_list] < (Q1 - 1.5 * IQR)) | (df[variable_list] > (Q3 + 1.5 * IQR))).any(axis=1)]
+
 ## GROUPING
 df = df.groupby(pd.Grouper(key='time', axis=0,  
                       freq='D', sort=True)).mean()
 
 df = df.interpolate(method="time")
+
+df = df[["activity", "circumplex.valence", "circumplex.arousal", "mood",]].copy()
 
 df['Lag_1'] = df['mood'].shift(1)
 df = df.dropna()
@@ -81,13 +92,23 @@ target_scaler = LabelEncoder()
 
 mae, y, yhat = walk_forward_validation(df, 0.2)
 print('MAE: %.3f' % mae)
+from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
+
+print(np.sqrt(mean_squared_error(y, yhat)))
+print(mean_squared_error(y,yhat))
+
 
 f = open("modelStatOutput/RFC.txt", "w")
-f.write('MAE: %.3f' % mae)
+f.write(f'MAE: {mean_absolute_error(y,yhat)}')
+f.write('\nRMSE: %.3f' %  np.sqrt(mean_squared_error(y, yhat)))
+f.write(f'\nMSE: {mean_squared_error(y,yhat)}')
 
 # plot expected vs predicted
 plt.plot(y, label='Expected')
 plt.plot(yhat, label='Predicted')
+plt.xlabel("Number of expected moods")
+plt.ylabel("Mood")
+plt.title("Predicted vs Expected")
 plt.legend()
 plt.savefig('DataMining/modelGraphOutput/RandomForestClassifer.png')
 plt.show()
