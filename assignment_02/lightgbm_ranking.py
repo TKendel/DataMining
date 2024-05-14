@@ -34,13 +34,6 @@ from tabulate import tabulate
 from functools import wraps
 
 
-#******
-def print_tabulate(df):
-        if isinstance(df, pd.DataFrame):
-            print(tabulate(df, headers='keys', tablefmt='psql'))
-        else:
-            return df
-
 
 """
 zipped_data = zipfile.ZipFile("training_set_VU_DM.zip")
@@ -72,6 +65,21 @@ for factor in categorical:
 #This line creates a new comp values
 data_df['comp']=data_df['comp1_rate'].fillna(0)+data_df['comp2_rate'].fillna(0)+data_df['comp3_rate'].fillna(0)+data_df['comp4_rate'].fillna(0)+data_df['comp5_rate'].fillna(0)+data_df['comp6_rate'].fillna(0)+data_df['comp7_rate'].fillna(0)+data_df['comp8_rate'].fillna(0)
 features = ['srch_id',  'prop_id', 'comp8_rate', 'comp8_inv', 'price_usd', 'prop_log_historical_price', 'prop_review_score', 'prop_starrating', 'comp']  #NOTE:  'gross_bookings_usd' is not on test set
+"""
+##parametters with best ourcome so far*******
+#n=100
+features = ['srch_id',  'prop_id', 'comp8_rate', 'comp8_inv', 'price_usd', 'prop_log_historical_price', 'prop_review_score', 'prop_starrating', 'comp']  #NOTE:  'gross_bookings_usd' is not on test set
+"""
+
+features = ['srch_id',  'prop_id', 'visitor_location_country_id', 'visitor_hist_starrating', 'visitor_hist_adr_usd', 'prop_country_id', 'prop_starrating', 'prop_review_score', 'prop_brand_bool', 'prop_location_score1', 'prop_location_score2', 'prop_log_historical_price', 'price_usd', 'promotion_flag', 'srch_destination_id', 'srch_length_of_stay', 'srch_booking_window', 'srch_adults_count', 'srch_children_count', 'srch_room_count', 'srch_saturday_night_bool', 'srch_query_affinity_score', 'orig_destination_distance', 'comp1_rate', 'comp1_inv', 'comp1_rate_percent_diff', 'comp2_rate', 'comp2_inv', 'comp2_rate_percent_diff', 'comp3_rate', 'comp3_inv', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp4_rate_percent_diff', 'comp5_rate', 'comp5_inv', 'comp5_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff', 'comp7_rate', 'comp7_inv', 'comp7_rate_percent_diff', 'comp8_rate', 'comp8_inv', 'comp8_rate_percent_diff', 'comp']  
+
+
+#paper features     - borrowed
+#features = ["srch_id",  'prop_id', 'prop_country_id', 'prop_review_score', 'srch_length_of_stay', 'srch_children_count', 'srch_query_affinity_score', 'comp1_inv', 'comp1_rate_percent_diff', 'comp2_inv', 'comp3_inv', 'comp3_rate_percent_diff', 'comp4_rate', 'comp4_inv', 'comp5_rate_percent_diff', 'comp6_rate', 'comp6_inv', 'comp6_rate_percent_diff']
+
+#****do min max or log on price and other large features****
+
+
 Y = data_df['superscore']
 X = data_df[features]
 
@@ -83,7 +91,8 @@ get_group_size = lambda df: df.reset_index().groupby("srch_id")['srch_id'].count
 train_groups = get_group_size(x_train)
 test_groups = get_group_size(x_test)
 
-n=100    #n=20
+print('Preparing model')
+n=100    #n=100
 model = LGBMRanker(objective="lambdarank",n_estimators=n, force_row_wise=True, seed=1) #The model is seeded*****
 model.fit(x_train,y_train,group=train_groups,eval_set=[(x_test,y_test)],eval_group=[test_groups],eval_metric=['map'])
 
@@ -97,57 +106,13 @@ And if memory is not enough, you can set `force_col_wise=true`.
 [LightGBM] [Info] Number of data points in the train set: 3966677, number of used features: 5
 [LightGBM] [Info] Total groups: 193144, total data: 991670
 """
-#folowed by 
-"""
-  File "/Users/inigom/Documents/Vrije Universiteit/Period 5/Data Mining/Assignments/assignment_02/lightgbm_ranking.py", line 84, in <module>
-    model.fit(x_train,y_train,group=train_groups,eval_set=[(x_test,y_test)],eval_group=[test_groups],eval_metric=['map'], force_row_wise=True)
-TypeError: fit() got an unexpected keyword argument 'force_row_wise'
-"""
-#???
+#Seems to be memory related, Fixed by adding force_row_wise=True to the model input
 
 
-#First group
-print(test_groups)
-"""
-candidates=
-predictions = pd.DataFrame(index=candidates)
-predictions['name'] = np.array([anime_id_2_name_map.get(id_) for id_ in candidates])
-predictions['score'] = ranker.predict(features[feature_columns])
-predictions = predictions.sort_values(by='score',ascending=False).head(N)
-"""
-
-predictions = model.predict(x_test)
-
-dic = {
-     'srch_id' : x_test['srch_id'],
-     'prop_id' : x_test['prop_id'],
-     'score' : predictions
-}
-
-print(predictions)
-print(type(predictions))
-
-
-print(dic)
-
-ranked = pd.DataFrame(dic)
-print(ranked)
-
-"""
-x_ranked['score'] = 
-#ranked = predictions
-ranked[] = x_test[]
-
-"""
-
-
-ranked = ranked.sort_values(by = ['srch_id', 'score'], ascending = [True, False])
+#Predictions on test dataset
 print("RANKED")
-print(ranked)
 
-
-
-
+print('importing test dataset')
 test_df = pd.read_csv('test_set_VU_DM.csv')
 test_df['comp']=data_df['comp1_rate'].fillna(0)+data_df['comp2_rate'].fillna(0)+data_df['comp3_rate'].fillna(0)+data_df['comp4_rate'].fillna(0)+data_df['comp5_rate'].fillna(0)+data_df['comp6_rate'].fillna(0)+data_df['comp7_rate'].fillna(0)+data_df['comp8_rate'].fillna(0)
 """
@@ -158,32 +123,17 @@ categorical = ['site_id', 'visitor_location_country_id', 'prop_country_id', 'pro
 for factor in categorical:
      if factor in test_df.columns.values:
         test_df[factor] = test_df[factor].astype('category')
-"""
-features = ['srch_id',  'prop_id', 'comp8_rate', 'comp8_inv', 'comp8_rate_percent_diff', 'gross_bookings_usd']
-X_t = test_df[features]
-"""
+
 #KeyError: "['gross_bookings_usd'] not in index"
 #I think the 'gross_bookings_usd' feature is not on the test set
 
 #features = ['srch_id',  'prop_id', 'comp8_rate', 'comp8_inv', 'comp8_rate_percent_diff']
 X_t = test_df[features]
 #Full Data***
-print(X_t.head())
-print(x_train.head())
 
 
 
-
-print(list(X.columns.values))
-print(list(X_t.columns.values))
-
-
-
-
-
-
-
-
+print('Making poredictions')
 predictions = model.predict(X_t)
 
 dic = {
@@ -199,9 +149,27 @@ ranked = ranked.sort_values(by = ['srch_id', 'score'], ascending = [True, False]
 print("RANKED")
 print(ranked)
 
+print('Savinf to file')
 out_fearures = ['srch_id',  'prop_id']
 output_df = ranked[out_fearures]
 output_df.to_csv('submission.csv', index=False)
 
 print(len(output_df))
 
+
+
+
+
+
+
+
+"""
+print('------------------------------------------------------------ ')
+print('Average nDCG across all queries in the validation at each evaluation point:')
+print('------------------------------------------------------------ ')
+print('Best nDCG@1:', model.best_score_['valid_0']['ndcg@1'])
+print('Best nDCG@5:', model.best_score_['valid_0']['ndcg@5'])
+print('Best nDCG@10:', model.best_score_['valid_0']['ndcg@10'])
+print('Best nDCG@20:', model.best_score_['valid_0']['ndcg@20'])
+print('Best nDCG@38:', model.best_score_['valid_0']['ndcg@38'])  #Higher is better
+"""
