@@ -72,8 +72,23 @@ Dropping all column based on the ammount of nan values and some ID columns which
 given we only care on users input.
 """
 # Drop columns
-dropped_variables = ["date_time","prop_id","visitor_hist_adr_usd","gross_bookings_usd","visitor_hist_starrating","visitor_location_country_id","srch_query_affinity_score","srch_query_affinity_score","comp1_rate","comp1_inv","comp1_rate_percent_diff","comp2_rate","comp2_inv","comp2_rate_percent_diff","comp3_rate","comp3_inv","comp3_rate_percent_diff","comp4_rate","comp4_inv","comp4_rate_percent_diff","comp5_rate","comp5_inv","comp5_rate_percent_diff","comp6_rate","comp6_inv","comp6_rate_percent_diff","comp7_rate","comp7_inv","comp7_rate_percent_diff","comp8_rate","comp8_inv","comp8_rate_percent_diff"]
+dropped_variables = ["date_time","visitor_hist_adr_usd","gross_bookings_usd","visitor_hist_starrating","visitor_location_country_id","srch_query_affinity_score","srch_query_affinity_score","comp1_rate","comp1_inv","comp1_rate_percent_diff","comp2_rate","comp2_inv","comp2_rate_percent_diff","comp3_rate","comp3_inv","comp3_rate_percent_diff","comp4_rate","comp4_inv","comp4_rate_percent_diff","comp5_rate","comp5_inv","comp5_rate_percent_diff","comp6_rate","comp6_inv","comp6_rate_percent_diff","comp7_rate","comp7_inv","comp7_rate_percent_diff","comp8_rate","comp8_inv","comp8_rate_percent_diff"]
 df.drop(columns=dropped_variables, inplace=True)
+
+# Create clicked and booked avearge for each hotel
+df['avg_click_per_hotel'] = df.groupby(by=['prop_id']).mean()['click_bool']
+# Create ratio
+sum_clicked = df.groupby(by=['prop_id']).sum()['click_bool']
+# sum_booked = df.groupby(by=['prop_id']).sum()['booked_bool']
+
+df['ratio'] = df.groupby(by=['prop_id']).sum()['booking_bool'] / df.groupby(by=['prop_id']).sum()['click_bool']
+print(df.ratio.unique())
+
+# df['sales'] / df.groupby('state')['sales'].transform('sum')
+print(df.head())
+print(f"Row count: {df.shape[0]} \n")
+print(f"Column count: {df.shape[1]}")
+exit()
 
 # Shuffle the rows around adn take 50% of the data
 df = df.sample(frac=0.5, random_state=99).reset_index(drop=True)
@@ -83,7 +98,7 @@ print(df.isnull().sum())
 # Remove null values
 df["prop_review_score"].fillna((df["prop_review_score"].mean()), inplace=True)
 df["prop_location_score2"].fillna((df["prop_location_score2"].mean()), inplace=True)
-df['orig_destination_distance'].fillna((df['orig_destination_distance'].mean()), inplace=True)
+df['orig_destination_distance'].fillna((df['orig_destination_distance'].median()), inplace=True)
 
 print(df.isnull().sum())
 
@@ -127,6 +142,8 @@ df = df.drop_duplicates()
 df = df.dropna(how='all', axis='columns')
 df = df.dropna(how='all', axis='rows')
 
+exit()
+
 # correlation = df.corr(method = 'spearman')
 # plt.figure(figsize=(18, 18))
 # sns.heatmap(correlation, vmax=1, square=True,annot=True,cmap='viridis')
@@ -154,13 +171,13 @@ df_new = pd.concat([not_click_sample, click_sample], axis=0)
 print("Number of rows", len(df_new))
 
 # Save to CSV
-df_new.to_csv('DataMining2/output/out2.csv', index=False)
+# df_new.to_csv('DataMining2/output/out2.csv', index=False)
 
 mms = MinMaxScaler()
 df_new[['price_usd','orig_destination_distance']] = mms.fit_transform(df_new[['price_usd','orig_destination_distance']])
 
 Y = df_new['click_bool']
-df_new = df_new.drop(columns=['click_bool', 'booking_bool'], axis=1)
+df_new = df_new.drop(columns=['click_bool'], axis=1)
 X = df_new
 
 # Split the data into features (X) and target (y)
@@ -210,3 +227,8 @@ def print_evaluation_metrics(trained_model,trained_model_name,X_test,y_test):
 
 rf.fit(X_train, y_train)
 print_evaluation_metrics(rf, "Random forest", X_test, y_test)
+
+
+#TODO: price gap price, current price, hisotrical prices,
+
+# gradiant boost - decision tree, light gbm
