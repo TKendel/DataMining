@@ -215,7 +215,6 @@ c_test_f =  test[c_fnames].values
 c_prob = classifier.predict_proba(c_test_f)[:,1]
 c_prob = list(-1.0*c_prob)
 
-## Making Recommendations
 recommendations = zip(test["srch_id"], test["prop_id"], 4*b_prob+c_prob)
 
 data_io.write_submission(recommendations)
