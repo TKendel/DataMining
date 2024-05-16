@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import random
+import pickle
 
 
 from matplotlib import pyplot as plt
@@ -17,9 +18,7 @@ from sklearn import metrics
 
 ## Load data into data frame ##
 data = pd.read_csv("DataMining2/training_set_VU_DM.csv", index_col=0)
-test_data = pd.read_csv("DataMining2/test_set_VU_DM.csv", index_col=0)
 df = pd.DataFrame(data)
-df_test = pd.DataFrame(test_data)
 
 # # # Data summary ##
 # # Dataframe dimension
@@ -84,16 +83,8 @@ given we only care on users input.
 print(df.isnull().sum())
 
 # Remove null values
-def randomiseMissingData(df2):
-    "randomise missing data for DataFrame (within a column)"
-    df = df2.copy()
-    for col in df.columns:
-        data = df['prop_review_score']
-        mask = data.isnull()
-        samples = random.choices( data[~mask].values , k = mask.sum() )
-        data[mask] = samples
-    return df
-df = randomiseMissingData(df)
+df['prop_review_score'].fillna(3, inplace=True)
+df['prop_review_score'][df['prop_review_score']==0]=2.5
 df["prop_location_score2"].fillna(0, inplace=True)
 df['srch_query_affinity_score'].fillna((df['srch_query_affinity_score'].mean()), inplace=True)
 df['orig_destination_distance'].fillna((df['orig_destination_distance'].median()), inplace=True)
@@ -151,49 +142,82 @@ for i in range(2,9):
 #             yticklabels=corr.columns.values)
 # plt.savefig("DataMining2/graphs/correlationMatrixSpearman.png")
 
-# # Clean up at asile 3
-# Remove duplicate data
-df = df.drop_duplicates().reset_index()
-# Remove completly empty rows and columns
-df = df.dropna(how='all', axis='columns')
-df = df.dropna(how='all', axis='rows')
+# # # Clean up at asile 3
+# # Remove duplicate data
+# df = df.drop_duplicates().reset_index()
+# # Remove completly empty rows and columns
+# df = df.dropna(how='all', axis='columns')
+# df = df.dropna(how='all', axis='rows')
+
+# # # Undersampling
+# # Get all clicked on hotels
+# click_indices = df[df.click_bool == 1].index
+# # Randomize selection between them
+# random_indices = np.random.choice(click_indices, len(df.loc[df.click_bool == 1]), replace=False)
+# # Get all the the regarding them to create a sample of clicked data
+# click_sample = df.loc[random_indices]
+
+# not_click = df[df.click_bool == 0].index
+# # Get random rows with click_bool=0 and make a vector of size sum click_bool, or len(click_indices)
+# random_indices = np.random.choice(not_click, len(click_indices), replace=False)
+# not_click_sample = df.loc[random_indices]
+
+# df_new = pd.concat([not_click_sample, click_sample], axis=0)
+
+# # The data is split now 50/50 between clicked and not clicked
+# print("Number of rows", len(df_new))
 
 # # Undersampling
 # Get all clicked on hotels
-click_indices = df[df.click_bool == 1].index
+booking_indices = df[df.booking_bool == 1].index
 # Randomize selection between them
-random_indices = np.random.choice(click_indices, len(df.loc[df.click_bool == 1]), replace=False)
+random_indices = np.random.choice(booking_indices, len(df.loc[df.booking_bool == 1]), replace=False)
 # Get all the the regarding them to create a sample of clicked data
-click_sample = df.loc[random_indices]
+booking_sample = df.loc[random_indices]
 
-not_click = df[df.click_bool == 0].index
+not_booked = df[df.booking_bool == 0].index
 # Get random rows with click_bool=0 and make a vector of size sum click_bool, or len(click_indices)
-random_indices = np.random.choice(not_click, len(click_indices), replace=False)
-not_click_sample = df.loc[random_indices]
+random_indices = np.random.choice(not_booked, len(booking_indices), replace=False)
+not_booking_sample = df.loc[random_indices]
 
-df_new = pd.concat([not_click_sample, click_sample], axis=0)
+df_new = pd.concat([not_booking_sample, booking_sample], axis=0)
 
-# The data is split now 50/50 between clicked and not clicked
 print("Number of rows", len(df_new))
 
-mms = MinMaxScaler()
-df_new[['price_usd','orig_destination_distance']] = mms.fit_transform(df_new[['price_usd','orig_destination_distance']])
 
-#Selelcting factor featires (categorical)
-categorical = ['prop_id']
-for factor in categorical:
-     df_new[factor] = df_new[factor].astype('category')
+# mms = MinMaxScaler()
+# df_new[['price_usd','orig_destination_distance']] = mms.fit_transform(df_new[['price_usd','orig_destination_distance']])
+
+# #Selelcting factor featires (categorical)
+# categorical = ['prop_id']
+# for factor in categorical:
+#      df_new[factor] = df_new[factor].astype('category')
+
+print(f"Row count: {df_new.shape[0]} \n")
+print(f"Column count: {df_new.shape[1]}")
 
 print(df_new.head())
 # Save to CSV
 # df.to_csv('DataMining2/output/out2.csv', index=False)
 train = df_new.copy()
-train.drop(columns=df_new.columns[28:53], inplace=True)
-train.drop(columns=['position','date_time','srch_id'], inplace=True)
+train.drop(columns=df_new.columns[27:53], inplace=True)
+print(train.columns[27:53])
+train.drop(columns=['position','date_time','srch_id', 'visitor_hist_starrating'], inplace=True)
 
+# x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, shuffle=False)#random_state=1 *****
+
+# #define the groups (searches)
+# get_group_size = lambda df: df.reset_index().groupby("srch_id")['srch_id'].count()
+# train_groups = get_group_size(x_train)
+# test_groups = get_group_size(x_test)
+
+# print('Preparing model')
+# n=100    #n=100
+# model = LGBMRanker(objective="lambdarank",n_estimators=n, force_row_wise=True, seed=1) #The model is seeded*****
+# model.fit(x_train,y_train,group=train_groups,eval_set=[(x_test,y_test)],eval_group=[test_groups],eval_metric=['map'])
 
 features = train.values
-target = df_new['click_bool'].values
+target = df_new['booking_bool'].values
 classifier = GradientBoostingClassifier(loss='log_loss', 
                                 learning_rate=0.1, 
                                 n_estimators=100, 
@@ -207,10 +231,59 @@ classifier = GradientBoostingClassifier(loss='log_loss',
                                 verbose=0)
 classifier.fit(features, target)
 
+print()
+with open("GBC_b.pkl", "wb") as f:
+    pickle.dump(classifier, f)
+
 exit()
 
+# Remove null values
+def randomiseMissingData(df2):
+    "randomise missing data for DataFrame (within a column)"
+    df = df2.copy()
+    for col in df.columns:
+        data = df['prop_review_score']
+        mask = data.isnull()
+        samples = random.choices( data[~mask].values , k = mask.sum() )
+        data[mask] = samples
+    return df
+df_test = randomiseMissingData(df_test)
+df_test["prop_location_score2"].fillna(0, inplace=True)
+df_test['srch_query_affinity_score'].fillna((df_test['srch_query_affinity_score'].mean()), inplace=True)
+df_test['orig_destination_distance'].fillna((df_test['orig_destination_distance'].median()), inplace=True)
+df_test["visitor_hist_adr_usd"].fillna(0, inplace=True)
+df_test.drop("visitor_hist_starrating", axis=1, inplace=True)
 
-c_fnames = train.get_features(test, False)
+for i in range(1,9):
+    df_test['comp'+str(i)+'_rate'].fillna(0, inplace=True)
+df_test['comp_rate_sum'] = df_test['comp1_rate']
+for i in range(1,9):
+    df_test['comp_rate_sum'] += df_test['comp'+str(i)+'_rate']
+
+for i in range(1,9):
+    df_test['comp'+str(i)+'_inv'].fillna(0, inplace=True)
+    df_test['comp'+str(i)+'_inv'][df_test['comp'+str(i)+'_inv']==1] = 10
+    df_test['comp'+str(i)+'_inv'][df_test['comp'+str(i)+'_inv']==-1] = 1
+    df_test['comp'+str(i)+'_inv'][df_test['comp'+str(i)+'_inv']==0] = -1
+    df_test['comp'+str(i)+'_inv'][df_test['comp'+str(i)+'_inv']==10] = 0
+df_test['comp_inv_sum'] = df_test['comp1_inv']
+for i in range(1,9):
+    df_test['comp_inv_sum'] += df_test['comp'+str(i)+'_inv']
+
+mms = MinMaxScaler()
+df_test[['price_usd','orig_destination_distance']] = mms.fit_transform(df_test[['price_usd','orig_destination_distance']])
+
+#Selelcting factor featires (categorical)
+categorical = ['prop_id']
+for factor in categorical:
+    df_test[factor] = df_test[factor].astype('category')
+
+
+test = df_test.copy()
+test.drop(columns=df_new.columns[:26], inplace=True)
+test.drop(columns=['position','date_time','srch_id'], inplace=True)
+print(test.columns)
+exit()
 c_test_f =  test[c_fnames].values
 c_prob = classifier.predict_proba(c_test_f)[:,1]
 c_prob = list(-1.0*c_prob)
