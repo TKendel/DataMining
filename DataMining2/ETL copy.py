@@ -6,7 +6,6 @@ import pickle
 
 
 from matplotlib import pyplot as plt
-from sklearn.model_selection import train_test_split
 # ANOVA feature selection for numeric input and categorical output
 from sklearn.preprocessing import MinMaxScaler
 # Models
@@ -168,18 +167,18 @@ for i in range(2,9):
 
 # # Undersampling
 # Get all clicked on hotels
-booking_indices = df[df.booking_bool == 1].index
+clicking_indices = df[df.click_bool == 1].index
 # Randomize selection between them
-random_indices = np.random.choice(booking_indices, len(df.loc[df.booking_bool == 1]), replace=False)
+random_indices = np.random.choice(clicking_indices, len(df.loc[df.click_bool == 1]), replace=False)
 # Get all the the regarding them to create a sample of clicked data
-booking_sample = df.loc[random_indices]
+clicking_sample = df.loc[random_indices]
 
 # Non Booked hotels
-not_booked = df[df.booking_bool == 0].index
-random_indices = np.random.choice(not_booked, len(booking_indices), replace=False)
-not_booking_sample = df.loc[random_indices]
+not_clicked = df[df.click_bool == 0].index
+random_indices = np.random.choice(not_clicked, len(clicking_indices), replace=False)
+not_click_sample = df.loc[random_indices]
 
-df_new = pd.concat([not_booking_sample, booking_sample], axis=0)
+df_new = pd.concat([not_click_sample, clicking_sample], axis=0)
 
 # mms = MinMaxScaler()
 # df_new[['price_usd','orig_destination_distance']] = mms.fit_transform(df_new[['price_usd','orig_destination_distance']])
@@ -197,8 +196,9 @@ print(f"Column count: {df_new.shape[1]}")
 train = df_new.copy()
 
 train.drop(columns=df_new.columns[27:54], inplace=True)
-train.drop(columns=['position','date_time','srch_id', 'visitor_hist_starrating'] , inplace=True)
+train.drop(columns=['position','date_time','srch_id', 'visitor_hist_starrating', 'visitor_hist_starrating_bool'] , inplace=True)
 
+# x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, shuffle=False)#random_state=1 *****
 
 # #define the groups (searches)
 # get_group_size = lambda df: df.reset_index().groupby("srch_id")['srch_id'].count()
@@ -210,13 +210,11 @@ train.drop(columns=['position','date_time','srch_id', 'visitor_hist_starrating']
 # model = LGBMRanker(objective="lambdarank",n_estimators=n, force_row_wise=True, seed=1) #The model is seeded*****
 # model.fit(x_train,y_train,group=train_groups,eval_set=[(x_test,y_test)],eval_group=[test_groups],eval_metric=['map'])
 
-# Save to CSV
+# # Save to CSV
 # df.to_csv('DataMining2/output/out2.csv', index=False)
 
 features = train.values
-target = df_new['booking_bool'].values
-
-x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=0.4, shuffle=False)#random_state=1 *****
+target = df_new['click_bool'].values
 
 classifier = GradientBoostingClassifier(loss='log_loss', 
                                 learning_rate=0.15, 
@@ -231,12 +229,8 @@ classifier = GradientBoostingClassifier(loss='log_loss',
                                 verbose=0)
 classifier.fit(features, target)
 
-print("Accuracy score (training): {0:.3f}".format(classifier.score(x_train, y_train)))
-print("Accuracy score (validation): {0:.3f}".format(classifier.score(x_test, y_test)))
-
-exit()
 print()
-with open("GBC_booking.pkl", "wb") as f:
+with open("GBC_clicked.pkl", "wb") as f:
     pickle.dump(classifier, f)
 
 #TODO: price gap price, current price, hisotrical prices,
